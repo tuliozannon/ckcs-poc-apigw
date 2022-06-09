@@ -73,16 +73,3 @@ public class CKCSAuthenticationService {
     }
 
 }
-
-soap 130, personId =1000, medicalnotes
-        t100-3423742328
-
-Tuilio medico do soap pode confirmar tudo
-
-William medico do soap pode confirmar tudo
-        Enfermeiros podem ler
-        Enfermeiros comments
-
-medical notes - medicos fazem o q quiser
-discharde notes - faz tudo
-exam notes - Perfil X
