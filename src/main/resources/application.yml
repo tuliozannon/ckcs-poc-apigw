@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: apigw-ckcspoc
+  main:
+    allow-circular-references: true # TODO: ClientsCommunicationService <-> OnlineCnpPaymentService
+  web:
+    resources:
+      add-mappings: false
+  lifecycle:
+    timeout-per-shutdown-phase: 1m #graceful timout to complete currentlly running requests
+  servlet.multipart:
+    max-file-size: 349MB
+    max-request-size: 350MB
+
+server:
+  shutdown: graceful
+  port: 8081
+  servlet:
+    encoding:
+      charset: UTF-8
+
+async:
+  provider-timeout-seconds: 60
+
+swagger.base-path: apigw-ckcspoc
+
+asset:
+  prefix:
+    apigw: /apigw-ckcspoc
+    cdn: /cdn
+    private: /private
+    public: /public
+
+ckcs:
+  auth:
+    environmentId: ${CKCS_ENVIRONMENT_ID}
+    apiSecret: ${CKCS_API_SECRET}
+    accessKey: ${CKCS_ACCESS_KEY}

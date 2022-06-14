@@ -1,0 +1,8 @@
+server:
+  port: 8082
+
+ckcs:
+  auth:
+    environmentId: ${CKCS_DS_ENVIRONMENT_ID}
+    apiSecret: ${CKCS_DS_API_SECRET}
+    accessKey: ${CKCS_DS_ACCESS_KEY}
