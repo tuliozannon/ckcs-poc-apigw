@@ -1,14 +1,11 @@
 package com.ckcspoc.ckcspocapigw.controller;
 
-import com.ckcspoc.ckcspocapigw.dto.CKCSResponseDto;
-import com.ckcspoc.ckcspocapigw.dto.CKCSWebhookEventDto;
-import com.ckcspoc.ckcspocapigw.service.CKCSAuthenticationService;
+import com.ckcspoc.ckcspocapigw.common.service.CKCSAuthenticationService;
 import com.ckcspoc.ckcspocapigw.service.CKCSService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,7 +38,7 @@ public class CKCSController {
     // Generates user token based on personId
     @GetMapping("/token")
     public String getToken(@RequestParam(value = "personId") Integer personId) {
-        return this.ckcsAuthenticationService.getUserToken(personId);
+        return this.ckcsService.getToken(personId);
     }
 
     // Delivers: Document Id
@@ -60,18 +57,13 @@ public class CKCSController {
     @PostMapping("/webhook")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<String> execWebhook(@RequestHeader("X-CS-Signature") String ckcsSignature,
-                                                       @RequestHeader("X-CS-Timestamp") String ckcsTimestamp,
-                                                       @RequestBody String payload,
-                                                       HttpServletRequest request) {
+                                              @RequestHeader("X-CS-Timestamp") String ckcsTimestamp,
+                                              @RequestBody String payload,
+                                              HttpServletRequest request) {
         String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         try{
-            log.info("execWebhook::ckcsSignature::->"+ckcsSignature);
-            log.info("execWebhook::ckcsTimestamp::->"+ckcsTimestamp);
-            log.info("execWebhook::payload::->"+payload);
-            log.info("execWebhook::path::->"+path);
-
             this.ckcsAuthenticationService.validateSignature(path, ckcsSignature, ckcsTimestamp, payload);
-            this.ckcsService.execWebhook(payload);
+            this.ckcsService.handleEvent(payload);
             return new ResponseEntity<>(payload, HttpStatus.OK);
         }
         catch(Exception e){

@@ -1,4 +1,4 @@
-package com.ckcspoc.ckcspocapigw.dto;
+package com.ckcspoc.ckcspocapigw.common.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

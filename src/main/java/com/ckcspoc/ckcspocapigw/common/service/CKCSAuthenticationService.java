@@ -1,10 +1,8 @@
-package com.ckcspoc.ckcspocapigw.service;
+package com.ckcspoc.ckcspocapigw.common.service;
 
-import com.ckcspoc.ckcspocapigw.config.CKCSAuthConfig;
-import com.ckcspoc.ckcspocapigw.dto.CKCSUserDto;
-import com.ckcspoc.ckcspocapigw.dto.PersonShortenDto;
-import com.ckcspoc.ckcspocapigw.util.CKCSConstants;
-import com.ckcspoc.ckcspocapigw.util.CKCSConverter;
+import com.ckcspoc.ckcspocapigw.common.config.CKCSAuthConfig;
+import com.ckcspoc.ckcspocapigw.common.dto.CKCSUserDto;
+import com.ckcspoc.ckcspocapigw.common.util.CKCSConstants;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
@@ -23,25 +21,17 @@ import java.util.Map;
 public class CKCSAuthenticationService {
     private static final String HMAC_SHA256 = "HmacSHA256";
     private static final String POST_METHOD = "POST";
-    private final PersonService personService;
-    private final CKCSConverter ckcsConverter;
     private final CKCSAuthConfig ckcsAuthConfig;
 
     public CKCSAuthenticationService(
-            PersonService personService,
-            CKCSConverter ckcsConverter,
             CKCSAuthConfig ckcsAuthConfig){
-        this.personService = personService;
-        this.ckcsConverter = ckcsConverter;
         this.ckcsAuthConfig = ckcsAuthConfig;
     }
 
     // **************************************************************************************
     // Used by client CKEditor to authenticate Front-End user
     // **************************************************************************************
-    public String getUserToken(Integer personId) {
-        PersonShortenDto personDto = this.personService.getShortenWithRoles(personId);
-        CKCSUserDto userDto = this.ckcsConverter.fromPersonToCKCSUser(personDto, personId);
+    public String getUserToken(CKCSUserDto userDto) {
         String environmentId = this.ckcsAuthConfig.getEnvironmentId();
         String accessKey = this.ckcsAuthConfig.getAccessKey();
 
