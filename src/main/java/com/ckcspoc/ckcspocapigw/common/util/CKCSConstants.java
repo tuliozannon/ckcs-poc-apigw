@@ -16,4 +16,11 @@ public class CKCSConstants {
     public static final String TOKEN_ROLE = "role";
     public static final String TOKEN_WRITER = "writer";
     public static final String TOKEN_READER = "reader";
+
+    public static final String GET = "GET";
+    public static final String POST = "POST";
+    public static final String PUT = "PUT";
+    public static final String DELETE = "DELETE";
+
+
 }

@@ -1,11 +1,15 @@
 package com.ckcspoc.ckcspocapigw.controller;
 
+import com.ckcspoc.ckcspocapigw.common.service.CKCSAPIIntegrationService;
 import com.ckcspoc.ckcspocapigw.common.service.CKCSAuthenticationService;
+import com.ckcspoc.ckcspocapigw.dto.DocumentDto;
 import com.ckcspoc.ckcspocapigw.service.CKCSService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 @RestController
 @RequestMapping("ckcs")
+@CrossOrigin
 public class CKCSController {
     private final CKCSService ckcsService;
     private final CKCSAuthenticationService ckcsAuthenticationService;
@@ -28,7 +33,8 @@ public class CKCSController {
     @Autowired
     public CKCSController(
             CKCSService ckcsService,
-            CKCSAuthenticationService ckcsAuthenticationService) {
+            CKCSAuthenticationService ckcsAuthenticationService,
+            CKCSAPIIntegrationService ckcsAPIIntegrationService) {
         this.ckcsService = ckcsService;
         this.ckcsAuthenticationService = ckcsAuthenticationService;
     }
@@ -41,14 +47,23 @@ public class CKCSController {
         return this.ckcsService.getToken(personId);
     }
 
-    // Delivers: Document Id
+    // Delivers: Channel Id
     // Triggered by: CKEditor UI component
-    // Generates document id based on baseId (example: soapid) and documenttype
-    @GetMapping("/documentid")
-    public String getDocumentId(@RequestParam(value = "baseId") String baseId,
+    // Generates channelId (documentId) based on baseId (example: soapid) and type (example: medical or discharged note)
+    @GetMapping("/channelId")
+    public String getChannelId(@RequestParam(value = "baseId") String baseId,
                                 @RequestParam(value = "type") Integer type) throws Exception{
-        return this.ckcsService.getDocumentId(baseId, type);
+        return this.ckcsService.getChannelId(baseId, type);
     }
+
+    // Delivers: Document (initial data)
+    // Triggered by: CKEditor UI component
+    // Delivers DocumentDto based on a channelId
+    @GetMapping("/document")
+    public DocumentDto getDocument(@RequestParam(value = "channelId") String channelId) {
+        return this.ckcsService.getDocument(channelId);
+    }
+
 
 
     // Delivers: HTTP Status Response
@@ -67,9 +82,9 @@ public class CKCSController {
             return new ResponseEntity<>(payload, HttpStatus.OK);
         }
         catch(Exception e){
+            log.info(e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-
 
 }

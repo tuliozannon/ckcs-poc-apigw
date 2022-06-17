@@ -36,3 +36,6 @@ ckcs:
     environmentId: ${CKCS_ENVIRONMENT_ID}
     apiSecret: ${CKCS_API_SECRET}
     accessKey: ${CKCS_ACCESS_KEY}
+
+ckcs-organization-id: "89797"
+ckcs-client-api-url: "https://${ckcs-organization-id}.cke-cs.com/api/v5/${ckcs.auth.environmentId}"

@@ -2,6 +2,7 @@ package com.ckcspoc.ckcspocapigw.common.service;
 
 import com.ckcspoc.ckcspocapigw.common.config.CKCSAuthConfig;
 import com.ckcspoc.ckcspocapigw.common.dto.CKCSUserDto;
+import com.ckcspoc.ckcspocapigw.common.dto.CKCSAPIHeaderDto;
 import com.ckcspoc.ckcspocapigw.common.util.CKCSConstants;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -12,6 +13,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
 import java.security.Key;
+import java.time.Instant;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +22,7 @@ import java.util.Map;
 @Service
 public class CKCSAuthenticationService {
     private static final String HMAC_SHA256 = "HmacSHA256";
-    private static final String POST_METHOD = "POST";
+    private static final String CKCS_API_PATH= "/api/v5/";
     private final CKCSAuthConfig ckcsAuthConfig;
 
     public CKCSAuthenticationService(
@@ -57,11 +59,8 @@ public class CKCSAuthenticationService {
                 }});
                 put(CKCSConstants.TOKEN_AUTH, new HashMap<String, Object>() {{
                     put(CKCSConstants.TOKEN_COLLABORATION, new HashMap<String, Object>() {{
-                        put("", new HashMap<String, Object>() {{
+                        put("*", new HashMap<String, Object>() {{
                             put(CKCSConstants.TOKEN_ROLE, CKCSConstants.TOKEN_WRITER);
-                        }});
-                        put("", new HashMap<String, Object>() {{
-                            put(CKCSConstants.TOKEN_ROLE, CKCSConstants.TOKEN_READER);
                         }});
                     }});
                 }});
@@ -75,23 +74,55 @@ public class CKCSAuthenticationService {
     // Used by server CKCloudServices S2S communications
     // **************************************************************************************
     public void validateSignature(String path, String ckcsSignature, String ckcsTimestamp, String body) throws Exception {
-        String method = POST_METHOD;
-        String generatedSignature = this.generateSignature(method, path, ckcsTimestamp, body);
+        String generatedSignature = this.generateSignature(CKCSConstants.POST, path, ckcsTimestamp, body);
         if (!ckcsSignature.equals(generatedSignature)){
             throw new Exception("Signature is not the same");
         }
     }
 
+    public CKCSAPIHeaderDto getAPIHeader(
+            String method,
+            String restPath
+    ){
+        return this.getAPIHeader(method, restPath, null);
+    }
+
+    public CKCSAPIHeaderDto getAPIHeader(
+            String method,
+            String restPath,
+            Object body
+    ){
+        String path = CKCS_API_PATH + this.ckcsAuthConfig.getEnvironmentId() + restPath;
+        String timestamp = String.valueOf(Instant.now().toEpochMilli());
+        String bodyStr = null;
+        if (body!=null) {
+            bodyStr = body.toString();
+        }
+
+        CKCSAPIHeaderDto dto = new CKCSAPIHeaderDto();
+        dto.setMethod(method);
+        dto.setPath(path);
+        dto.setTimestamp(timestamp);
+        dto.setBody(body);
+        try{
+            dto.setSignature(this.generateSignature(method, path, timestamp, bodyStr));
+        }
+        catch(Exception e){
+            log.info(e.getMessage());
+        }
+        return dto;
+    }
+
+
     public String generateSignature(String method, String path, String timestamp, String body) throws Exception {
         String methodUpperCase = method.toUpperCase();
         String apiSecret = this.ckcsAuthConfig.getApiSecret();
 
-        String signatureData = methodUpperCase + path + timestamp;
+        String plainData = methodUpperCase + path + timestamp;
         if (body != null) {
-            signatureData += body;
+            plainData += body;
         }
-
-        return calculateHMACSHA256(signatureData, apiSecret);
+        return calculateHMACSHA256(plainData, apiSecret);
     }
 
     private String calculateHMACSHA256(String data, String apiSecret) throws Exception {
