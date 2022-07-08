@@ -2,6 +2,7 @@ package com.ckcspoc.ckcspocapigw.controller;
 
 import com.ckcspoc.ckcspocapigw.common.service.CKCSAPIIntegrationService;
 import com.ckcspoc.ckcspocapigw.common.service.CKCSAuthenticationService;
+import com.ckcspoc.ckcspocapigw.common.util.CKCSConstants;
 import com.ckcspoc.ckcspocapigw.dto.DocumentDto;
 import com.ckcspoc.ckcspocapigw.service.CKCSService;
 import lombok.extern.slf4j.Slf4j;
@@ -77,7 +78,7 @@ public class CKCSController {
                                               HttpServletRequest request) {
         String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         try{
-            this.ckcsAuthenticationService.validateSignature(path, ckcsSignature, ckcsTimestamp, payload);
+            this.ckcsAuthenticationService.validateSignature(CKCSConstants.POST, path, ckcsSignature, ckcsTimestamp, payload);
             this.ckcsService.handleEvent(payload);
             return new ResponseEntity<>(payload, HttpStatus.OK);
         }

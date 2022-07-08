@@ -14,6 +14,11 @@ configurations {
 	}
 }
 
+ext {
+	set('springCloudVersion', "2021.0.3")
+	feignVersion = '11.8'
+}
+
 repositories {
 	mavenCentral()
 }
@@ -22,6 +27,17 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// to write web client using OpenFeign
+	implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+	implementation group: 'io.github.openfeign', name: 'feign-core', version: "${feignVersion}"
+	implementation group: 'io.github.openfeign', name: 'feign-jaxb', version: "${feignVersion}"
+	implementation group: 'io.github.openfeign', name: 'feign-jackson', version: "${feignVersion}"
+	implementation group: 'io.github.openfeign', name: 'feign-okhttp', version: "${feignVersion}"
+
+
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
@@ -33,6 +49,13 @@ dependencies {
 			//'org.bouncycastle:bcprov-jdk15on:1.70',
 			'io.jsonwebtoken:jjwt-jackson:0.11.5' // or 'io.jsonwebtoken:jjwt-gson:0.11.5' for gson
 }
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
+
 
 tasks.named('test') {
 	useJUnitPlatform()

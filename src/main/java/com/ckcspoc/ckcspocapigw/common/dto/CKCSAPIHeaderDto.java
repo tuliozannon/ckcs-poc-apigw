@@ -12,5 +12,5 @@ public class CKCSAPIHeaderDto {
     private String method;
     private String timestamp;
     private String signature;
-    private Object body;
+    private String body;
 }

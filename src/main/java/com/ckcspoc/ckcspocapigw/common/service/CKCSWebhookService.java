@@ -32,9 +32,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class CKCSWebhookService {
     private final JsonGenericBeanConverter jsonGenericBeanConverter;
+    protected final CKCSAPIIntegrationService ckcsapiIntegrationService;
 
-    public CKCSWebhookService(JsonGenericBeanConverter jsonGenericBeanConverter){
+
+    public CKCSWebhookService(JsonGenericBeanConverter jsonGenericBeanConverter,
+                              CKCSAPIIntegrationService ckcsapiIntegrationService){
         this.jsonGenericBeanConverter = jsonGenericBeanConverter;
+        this.ckcsapiIntegrationService = ckcsapiIntegrationService;
     }
 
     public final CKCSEventDto handleEvent(String eventStr){

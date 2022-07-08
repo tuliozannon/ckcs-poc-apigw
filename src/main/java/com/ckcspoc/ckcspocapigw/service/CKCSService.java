@@ -5,8 +5,21 @@ import com.ckcspoc.ckcspocapigw.common.service.CKCSAPIIntegrationService;
 import com.ckcspoc.ckcspocapigw.common.service.CKCSAuthenticationService;
 import com.ckcspoc.ckcspocapigw.dto.DocumentDto;
 import com.ckcspoc.ckcspocapigw.dto.PersonShortenDto;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Slf4j

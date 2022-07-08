@@ -4,6 +4,7 @@ import com.ckcspoc.ckcspocapigw.common.config.CKCSAuthConfig;
 import com.ckcspoc.ckcspocapigw.common.dto.CKCSUserDto;
 import com.ckcspoc.ckcspocapigw.common.dto.CKCSAPIHeaderDto;
 import com.ckcspoc.ckcspocapigw.common.util.CKCSConstants;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
@@ -73,8 +74,8 @@ public class CKCSAuthenticationService {
     // **************************************************************************************
     // Used by server CKCloudServices S2S communications
     // **************************************************************************************
-    public void validateSignature(String path, String ckcsSignature, String ckcsTimestamp, String body) throws Exception {
-        String generatedSignature = this.generateSignature(CKCSConstants.POST, path, ckcsTimestamp, body);
+    public void validateSignature(String method, String path, String ckcsSignature, String ckcsTimestamp, String body) throws Exception {
+        String generatedSignature = this.generateSignature(method, path, ckcsTimestamp, body);
         if (!ckcsSignature.equals(generatedSignature)){
             throw new Exception("Signature is not the same");
         }
@@ -94,18 +95,16 @@ public class CKCSAuthenticationService {
     ){
         String path = CKCS_API_PATH + this.ckcsAuthConfig.getEnvironmentId() + restPath;
         String timestamp = String.valueOf(Instant.now().toEpochMilli());
-        String bodyStr = null;
-        if (body!=null) {
-            bodyStr = body.toString();
-        }
 
         CKCSAPIHeaderDto dto = new CKCSAPIHeaderDto();
         dto.setMethod(method);
         dto.setPath(path);
         dto.setTimestamp(timestamp);
-        dto.setBody(body);
+        String bodyStr = this.convertObjectToString(body);
+        dto.setBody(bodyStr);
         try{
-            dto.setSignature(this.generateSignature(method, path, timestamp, bodyStr));
+            String signature = this.generateSignature(method, path, timestamp, bodyStr);
+            dto.setSignature(signature);
         }
         catch(Exception e){
             log.info(e.getMessage());
@@ -144,7 +143,16 @@ public class CKCSAuthenticationService {
         return formatter.toString();
     }
 
-
-
-
+    public String convertObjectToString(Object object){
+        String objectStr = null;
+        if (object!=null) {
+            try{
+                objectStr = new ObjectMapper().writeValueAsString(object);
+            }
+            catch (Exception e){
+                e.printStackTrace(System.out);
+            }
+        }
+        return objectStr;
+    }
 }
