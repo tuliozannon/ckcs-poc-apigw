@@ -50,7 +50,7 @@ public class CKCSWebhookService {
     }
 
     protected final void handle(CKCSEventDto dto){
-        log.info("event("+dto.getEvent()+") "+dto);
+        log.info("CKCSWebhookService::handle("+dto.getEvent()+") "+dto);
         switch (dto.getEvent()){
             // Ping Event
             case CKCSEventPingDto.EVENT_KEY:            this.handle((CKCSEventPingDto) dto.getPayload());            break;

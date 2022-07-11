@@ -3,6 +3,7 @@ package com.ckcspoc.ckcspocapigw.service;
 import com.ckcspoc.ckcspocapigw.common.dto.CKCSUserDto;
 import com.ckcspoc.ckcspocapigw.common.service.CKCSAPIIntegrationService;
 import com.ckcspoc.ckcspocapigw.common.service.CKCSAuthenticationService;
+import com.ckcspoc.ckcspocapigw.dto.CollaborativeSessionDto;
 import com.ckcspoc.ckcspocapigw.dto.DocumentDto;
 import com.ckcspoc.ckcspocapigw.dto.PersonShortenDto;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -29,7 +30,6 @@ public class CKCSService {
     private final CKCSAuthenticationService ckcsAuthenticationService;
     private final CKCSEventService ckcsEventService;
     private final CKCSAPIIntegrationService ckcsAPIIntegrationService;
-
 
     public CKCSService(PersonService personService,
                        CKCSAuthenticationService ckcsAuthenticationService,
@@ -63,14 +63,48 @@ public class CKCSService {
         return dto;
     }
 
-    // TODO: be adapted
-    public String getChannelId(String baseId, Integer type) throws Exception{
-        String documentId = "t"+type+"_"+baseId;
-        log.info("getChannelId::"+documentId);
-        return documentId;
+    public DocumentDto syncDocumentToCloud(DocumentDto documentDto) {
+        if ((documentDto!=null) && (documentDto.getChannelId() != null)){
+            String documentId = documentDto.getChannelId();
+            // if collaboration doesnt exists
+            // create collaborative session
+            if (!this.ckcsAPIIntegrationService.isCollaborationExists(documentId)){
+                // TODO: get bundle version
+                String bundleVersionId = "ckeditor-1.0.3";
+
+                CollaborativeSessionDto collaborativeSessionDto = new CollaborativeSessionDto();
+                collaborativeSessionDto.setDocumentId(documentDto.getChannelId());
+                collaborativeSessionDto.setBundleVersionId(bundleVersionId);
+                collaborativeSessionDto.setData(documentDto.getContent());
+
+                this.ckcsAPIIntegrationService.createCollaboration(collaborativeSessionDto);
+            }
+        }
+        return documentDto;
     }
 
-    // TODO: be adapted
+    public DocumentDto syncDocumentToStorage(DocumentDto documentDto) {
+        if ((documentDto!=null) && (documentDto.getChannelId() != null)){
+            String documentId = documentDto.getChannelId();
+            // if collaboration doesnt exists
+            // create collaborative session
+            if (!this.ckcsAPIIntegrationService.isCollaborationExists(documentId)){
+                // TODO: get bundle version
+                String bundleVersionId = "ckeditor-1.0.3";
+
+                CollaborativeSessionDto collaborativeSessionDto = new CollaborativeSessionDto();
+                collaborativeSessionDto.setDocumentId(documentDto.getChannelId());
+                collaborativeSessionDto.setBundleVersionId(bundleVersionId);
+                collaborativeSessionDto.setData(documentDto.getContent());
+
+                this.ckcsAPIIntegrationService.createCollaboration(collaborativeSessionDto);
+            }
+            this.ckcsAPIIntegrationService.flushCollaboration(documentId, true);
+        }
+        return documentDto;
+    }
+
+    /*
     public DocumentDto getDocument(String channelId) {
         //mocked data
         DocumentDto dto = new DocumentDto();
@@ -98,5 +132,7 @@ public class CKCSService {
         log.info("getDocument::"+dto);
         return dto;
     }
+    */
+
 
 }

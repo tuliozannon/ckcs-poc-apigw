@@ -1,10 +1,10 @@
 package com.ckcspoc.ckcspocapigw.common.service;
 
 import com.ckcspoc.ckcspocapigw.client.CKCSClient;
-import com.ckcspoc.ckcspocapigw.common.dto.CKCSAPIHeaderDto;
+import com.ckcspoc.ckcspocapigw.common.dto.CKCSRequestDto;
 import com.ckcspoc.ckcspocapigw.common.dto.editor.EditorBundleDto;
 import com.ckcspoc.ckcspocapigw.common.util.CKCSConstants;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ckcspoc.ckcspocapigw.dto.CollaborativeSessionDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -32,43 +32,56 @@ public class CKCSAPIIntegrationService {
      **************************************************************************/
     public Object getCollaborations() {
         String path = "/collaborations";
-        CKCSAPIHeaderDto header = this.ckcsAuthenticationService.getAPIHeader(CKCSConstants.GET, path);
-        return this.ckcsClient.getCollaborations(header.getSignature(), header.getTimestamp());
+        CKCSRequestDto request = this.ckcsAuthenticationService.getRequest(CKCSConstants.GET, path);
+        return this.ckcsClient.getCollaborations(request.getSignature(), request.getTimestamp());
     }
 
-    public Object isCollaborationExists(String documentId) {
+    public Boolean isCollaborationExists(String documentId) {
         String path = "/collaborations/"+documentId+"/exists";
-        CKCSAPIHeaderDto header = this.ckcsAuthenticationService.getAPIHeader(CKCSConstants.GET, path);
-        return this.ckcsClient.isCollaborationExists(header.getSignature(), header.getTimestamp(), documentId);
+        CKCSRequestDto request = this.ckcsAuthenticationService.getRequest(CKCSConstants.GET, path);
+        Object object = this.ckcsClient.isCollaborationExists(request.getSignature(), request.getTimestamp(), documentId);
+        return (object != null) && (((Map)object).get("exists").equals(true));
     }
 
     public String getCollaboration(String documentId) {
         String path = "/collaborations/"+documentId;
 
-        CKCSAPIHeaderDto header = this.ckcsAuthenticationService.getAPIHeader(CKCSConstants.GET, path);
-        return this.ckcsClient.getCollaboration(header.getSignature(), header.getTimestamp(), documentId);
+        CKCSRequestDto request = this.ckcsAuthenticationService.getRequest(CKCSConstants.GET, path);
+        return this.ckcsClient.getCollaboration(request.getSignature(), request.getTimestamp(), documentId);
     }
 
     public Object getCollaborationDetails(String documentId) {
         String path = "/collaborations/"+documentId+"/details";
-        CKCSAPIHeaderDto header = this.ckcsAuthenticationService.getAPIHeader(CKCSConstants.GET, path);
-        return this.ckcsClient.getCollaborationDetails(header.getSignature(), header.getTimestamp(), documentId);
+        CKCSRequestDto request = this.ckcsAuthenticationService.getRequest(CKCSConstants.GET, path);
+        return this.ckcsClient.getCollaborationDetails(request.getSignature(), request.getTimestamp(), documentId);
     }
 
     public Object flushCollaboration(String documentId, Boolean force) {
         if (force==null) force = false;
         String path = "/collaborations/"+documentId+"?wait=true&force="+force;
 
-        CKCSAPIHeaderDto header = this.ckcsAuthenticationService.getAPIHeader(CKCSConstants.DELETE, path);
-        return this.ckcsClient.flushCollaboration(header.getSignature(), header.getTimestamp(), documentId, force);
+        CKCSRequestDto request = this.ckcsAuthenticationService.getRequest(CKCSConstants.DELETE, path);
+        return this.ckcsClient.flushCollaboration(request.getSignature(), request.getTimestamp(), documentId, force);
     }
 
     public Object flushCollaborations(Boolean force) {
         if (force==null) force = false;
         String path = "/collaborations?force="+force;
 
-        CKCSAPIHeaderDto header = this.ckcsAuthenticationService.getAPIHeader(CKCSConstants.DELETE, path);
-        return this.ckcsClient.flushCollaborations(header.getSignature(), header.getTimestamp(), force);
+        CKCSRequestDto request = this.ckcsAuthenticationService.getRequest(CKCSConstants.DELETE, path);
+        return this.ckcsClient.flushCollaborations(request.getSignature(), request.getTimestamp(), force);
+    }
+
+    public Object createCollaboration(CollaborativeSessionDto dto) {
+        String path = "/collaborations";
+        CKCSRequestDto request = this.ckcsAuthenticationService.getRequest(CKCSConstants.POST, path, dto);
+        return this.ckcsClient.createCollaboration(request.getSignature(), request.getTimestamp(), request.getBody());
+    }
+
+    public Object restoreCollaboration(String documentId) {
+        String path = "/collaborations";
+        CKCSRequestDto request = this.ckcsAuthenticationService.getRequest(CKCSConstants.PUT, path);
+        return this.ckcsClient.createCollaboration(request.getSignature(), request.getTimestamp(), documentId);
     }
 
     /**************************************************************************
@@ -76,19 +89,17 @@ public class CKCSAPIIntegrationService {
      **************************************************************************/
     public Object isEditorBundleExists(String bundle_version) {
         String path = "/editors/"+bundle_version+"/exists";
-        CKCSAPIHeaderDto header = this.ckcsAuthenticationService.getAPIHeader(CKCSConstants.GET, path);
-        return this.ckcsClient.isEditorBundleExists(header.getSignature(), header.getTimestamp(), bundle_version);
+        CKCSRequestDto request = this.ckcsAuthenticationService.getRequest(CKCSConstants.GET, path);
+        return this.ckcsClient.isEditorBundleExists(request.getSignature(), request.getTimestamp(), bundle_version);
     }
 
-    public Object uploadEditorBundle(EditorBundleDto editorBundle) {
+    public Object uploadEditorBundle(EditorBundleDto dto) {
         String path = "/editors/";
-        if (editorBundle.getBundle().equals("@bundle_js@")){
-            String editorBundleName = editorBundle.getConfig().getCloudServices().getBundleVersion();
-            String editorBundleJS = this.ckcsEditorBundleService.getEditorBundleFromResource(editorBundleName);
-            editorBundle.setBundle(editorBundleJS);
-        }
-        CKCSAPIHeaderDto header = this.ckcsAuthenticationService.getAPIHeader(CKCSConstants.POST, path, editorBundle);
-        return this.ckcsClient.uploadEditorBundle(header.getSignature(), header.getTimestamp(), header.getBody());
+        String editorBundleName = dto.getConfig().getCloudServices().getBundleVersion();
+        String editorBundleJS = this.ckcsEditorBundleService.getEditorBundleFromResource(editorBundleName);
+        dto.setBundle(editorBundleJS);
+        CKCSRequestDto request = this.ckcsAuthenticationService.getRequest(CKCSConstants.POST, path, dto);
+        return this.ckcsClient.uploadEditorBundle(request.getSignature(), request.getTimestamp(), request.getBody());
     }
 
     /**************************************************************************
@@ -102,15 +113,15 @@ public class CKCSAPIIntegrationService {
         String path = "/storage?limit="+limit+"&sort_by="+sortBy+"&order="+order;
         if (cursor != null) path += "&cursor="+cursor;
 
-        CKCSAPIHeaderDto header = this.ckcsAuthenticationService.getAPIHeader(CKCSConstants.GET, path);
-        return this.ckcsClient.getDocumentsFromStorage(header.getSignature(), header.getTimestamp(), limit, sortBy, order, cursor);
+        CKCSRequestDto request = this.ckcsAuthenticationService.getRequest(CKCSConstants.GET, path);
+        return this.ckcsClient.getDocumentsFromStorage(request.getSignature(), request.getTimestamp(), limit, sortBy, order, cursor);
     }
 
     public String getDocumentFromStorage(String documentId) {
         String path = "/storage/"+documentId;
 
-        CKCSAPIHeaderDto header = this.ckcsAuthenticationService.getAPIHeader(CKCSConstants.GET, path);
-        return this.ckcsClient.getDocumentFromStorage(header.getSignature(), header.getTimestamp(), documentId);
+        CKCSRequestDto request = this.ckcsAuthenticationService.getRequest(CKCSConstants.GET, path);
+        return this.ckcsClient.getDocumentFromStorage(request.getSignature(), request.getTimestamp(), documentId);
     }
 
 }

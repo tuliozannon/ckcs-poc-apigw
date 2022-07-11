@@ -2,7 +2,7 @@ package com.ckcspoc.ckcspocapigw.common.service;
 
 import com.ckcspoc.ckcspocapigw.common.config.CKCSAuthConfig;
 import com.ckcspoc.ckcspocapigw.common.dto.CKCSUserDto;
-import com.ckcspoc.ckcspocapigw.common.dto.CKCSAPIHeaderDto;
+import com.ckcspoc.ckcspocapigw.common.dto.CKCSRequestDto;
 import com.ckcspoc.ckcspocapigw.common.util.CKCSConstants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
@@ -81,14 +81,14 @@ public class CKCSAuthenticationService {
         }
     }
 
-    public CKCSAPIHeaderDto getAPIHeader(
+    public CKCSRequestDto getRequest(
             String method,
             String restPath
     ){
-        return this.getAPIHeader(method, restPath, null);
+        return this.getRequest(method, restPath, null);
     }
 
-    public CKCSAPIHeaderDto getAPIHeader(
+    public CKCSRequestDto getRequest(
             String method,
             String restPath,
             Object body
@@ -96,7 +96,7 @@ public class CKCSAuthenticationService {
         String path = CKCS_API_PATH + this.ckcsAuthConfig.getEnvironmentId() + restPath;
         String timestamp = String.valueOf(Instant.now().toEpochMilli());
 
-        CKCSAPIHeaderDto dto = new CKCSAPIHeaderDto();
+        CKCSRequestDto dto = new CKCSRequestDto();
         dto.setMethod(method);
         dto.setPath(path);
         dto.setTimestamp(timestamp);

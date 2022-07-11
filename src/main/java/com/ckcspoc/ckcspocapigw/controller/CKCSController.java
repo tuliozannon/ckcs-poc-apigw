@@ -5,6 +5,7 @@ import com.ckcspoc.ckcspocapigw.common.service.CKCSAuthenticationService;
 import com.ckcspoc.ckcspocapigw.common.util.CKCSConstants;
 import com.ckcspoc.ckcspocapigw.dto.DocumentDto;
 import com.ckcspoc.ckcspocapigw.service.CKCSService;
+import com.ckcspoc.ckcspocapigw.service.SoapService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,14 +31,17 @@ import javax.servlet.http.HttpServletRequest;
 public class CKCSController {
     private final CKCSService ckcsService;
     private final CKCSAuthenticationService ckcsAuthenticationService;
+    private final SoapService soapService;
 
     @Autowired
     public CKCSController(
             CKCSService ckcsService,
             CKCSAuthenticationService ckcsAuthenticationService,
-            CKCSAPIIntegrationService ckcsAPIIntegrationService) {
+            CKCSAPIIntegrationService ckcsAPIIntegrationService,
+            SoapService soapService) {
         this.ckcsService = ckcsService;
         this.ckcsAuthenticationService = ckcsAuthenticationService;
+        this.soapService = soapService;
     }
 
     // Delivers: User token
@@ -52,9 +56,10 @@ public class CKCSController {
     // Triggered by: CKEditor UI component
     // Generates channelId (documentId) based on baseId (example: soapid) and type (example: medical or discharged note)
     @GetMapping("/channelId")
-    public String getChannelId(@RequestParam(value = "baseId") String baseId,
+    public String getChannelId(@RequestParam(value = "baseId") Integer baseId,
                                 @RequestParam(value = "type") Integer type) throws Exception{
-        return this.ckcsService.getChannelId(baseId, type);
+        log.info("CKCSController::getChannelId::"+baseId+"::"+type);
+        return this.soapService.getChannelId(baseId, type);
     }
 
     // Delivers: Document (initial data)
@@ -62,9 +67,9 @@ public class CKCSController {
     // Delivers DocumentDto based on a channelId
     @GetMapping("/document")
     public DocumentDto getDocument(@RequestParam(value = "channelId") String channelId) {
-        return this.ckcsService.getDocument(channelId);
+        log.info("CKCSController::getDocument::"+channelId);
+        return this.soapService.getDocument(channelId);
     }
-
 
 
     // Delivers: HTTP Status Response
@@ -76,6 +81,7 @@ public class CKCSController {
                                               @RequestHeader("X-CS-Timestamp") String ckcsTimestamp,
                                               @RequestBody String payload,
                                               HttpServletRequest request) {
+        log.info("CKCSController::execWebhook::[EVENT]");
         String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         try{
             this.ckcsAuthenticationService.validateSignature(CKCSConstants.POST, path, ckcsSignature, ckcsTimestamp, payload);

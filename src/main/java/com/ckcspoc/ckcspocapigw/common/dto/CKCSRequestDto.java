@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CKCSAPIHeaderDto {
+public class CKCSRequestDto {
     private String path;
     private String method;
     private String timestamp;

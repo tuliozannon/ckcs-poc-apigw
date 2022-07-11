@@ -60,6 +60,13 @@ public interface CKCSClient {
             @RequestHeader("X-CS-Timestamp") String xcsTimestamp,
             @PathVariable Boolean force);
 
+    //Create a collaborative editing session
+    @PostMapping("/collaborations")
+    Object createCollaboration(
+            @RequestHeader("X-CS-Signature") String xcsSignature,
+            @RequestHeader("X-CS-Timestamp") String xcsTimestamp,
+            @RequestBody String collaborationData);
+
     /**************************************************************************
      * EDITOR BUNDLE
      **************************************************************************/
