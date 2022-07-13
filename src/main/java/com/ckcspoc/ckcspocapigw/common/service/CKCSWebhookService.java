@@ -3,7 +3,7 @@ package com.ckcspoc.ckcspocapigw.common.service;
 import com.ckcspoc.ckcspocapigw.common.dto.event.CKCSEventDto;
 import com.ckcspoc.ckcspocapigw.common.dto.event.CKCSEventDtoFactory;
 import com.ckcspoc.ckcspocapigw.common.dto.event.collaboration.CKCSEventCollaborationSessionRecoveredDto;
-import com.ckcspoc.ckcspocapigw.common.dto.event.collaboration.CKCSEventCollaborationSessionRemovedDto;
+import com.ckcspoc.ckcspocapigw.common.dto.event.collaboration.CKCSEventCollaborationSessionFinishedDto;
 import com.ckcspoc.ckcspocapigw.common.dto.event.collaboration.CKCSEventCollaborationSessionUpdatedDto;
 import com.ckcspoc.ckcspocapigw.common.dto.event.collaboration.CKCSEventUserConnectedDto;
 import com.ckcspoc.ckcspocapigw.common.dto.event.collaboration.CKCSEventUserDisconnectedDto;
@@ -31,14 +31,10 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class CKCSWebhookService {
-    private final JsonGenericBeanConverter jsonGenericBeanConverter;
-    protected final CKCSAPIIntegrationService ckcsapiIntegrationService;
+    protected final JsonGenericBeanConverter jsonGenericBeanConverter;
 
-
-    public CKCSWebhookService(JsonGenericBeanConverter jsonGenericBeanConverter,
-                              CKCSAPIIntegrationService ckcsapiIntegrationService){
+    public CKCSWebhookService(JsonGenericBeanConverter jsonGenericBeanConverter){
         this.jsonGenericBeanConverter = jsonGenericBeanConverter;
-        this.ckcsapiIntegrationService = ckcsapiIntegrationService;
     }
 
     public final CKCSEventDto handleEvent(String eventStr){
@@ -67,7 +63,7 @@ public class CKCSWebhookService {
             case CKCSEventUserConnectedDto.EVENT_KEY:                   this.handle((CKCSEventUserConnectedDto) dto.getPayload());                   break;
             case CKCSEventUserDisconnectedDto.EVENT_KEY:                this.handle((CKCSEventUserDisconnectedDto) dto.getPayload());                break;
             case CKCSEventCollaborationSessionUpdatedDto.EVENT_KEY:     this.handle((CKCSEventCollaborationSessionUpdatedDto) dto.getPayload());     break;
-            case CKCSEventCollaborationSessionRemovedDto.EVENT_KEY:     this.handle((CKCSEventCollaborationSessionRemovedDto) dto.getPayload());     break;
+            case CKCSEventCollaborationSessionFinishedDto.EVENT_KEY:     this.handle((CKCSEventCollaborationSessionFinishedDto) dto.getPayload());     break;
             case CKCSEventCollaborationSessionRecoveredDto.EVENT_KEY:   this.handle((CKCSEventCollaborationSessionRecoveredDto) dto.getPayload());   break;
 
             // Document Storage Events
@@ -99,7 +95,7 @@ public class CKCSWebhookService {
     protected void handle(CKCSEventUserConnectedDto dto){}
     protected void handle(CKCSEventUserDisconnectedDto dto){}
     protected void handle(CKCSEventCollaborationSessionUpdatedDto dto){}
-    protected void handle(CKCSEventCollaborationSessionRemovedDto dto){}
+    protected void handle(CKCSEventCollaborationSessionFinishedDto dto){}
     protected void handle(CKCSEventCollaborationSessionRecoveredDto dto){}
 
     // Document Storage Events

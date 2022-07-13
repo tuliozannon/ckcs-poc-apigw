@@ -104,5 +104,11 @@ public interface CKCSClient {
             @RequestHeader("X-CS-Timestamp") String xcsTimestamp,
             @PathVariable String documentId);
 
+    //Delete a specific document from Storage
+    @DeleteMapping("/storage/{documentId}")
+    Object deleteDocumentFromStorage(
+            @RequestHeader("X-CS-Signature") String xcsSignature,
+            @RequestHeader("X-CS-Timestamp") String xcsTimestamp,
+            @PathVariable String documentId);
 
 }

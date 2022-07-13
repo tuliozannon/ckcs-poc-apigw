@@ -6,7 +6,7 @@ import com.ckcspoc.ckcspocapigw.common.dto.event.ping.CKCSEventPingDto;
 import com.ckcspoc.ckcspocapigw.common.dto.event.trackchanges.CKCSEventSuggestionAcceptedDto;
 import com.ckcspoc.ckcspocapigw.common.dto.event.trackchanges.CKCSEventSuggestionRejectedDto;
 import com.ckcspoc.ckcspocapigw.common.dto.event.collaboration.CKCSEventCollaborationSessionRecoveredDto;
-import com.ckcspoc.ckcspocapigw.common.dto.event.collaboration.CKCSEventCollaborationSessionRemovedDto;
+import com.ckcspoc.ckcspocapigw.common.dto.event.collaboration.CKCSEventCollaborationSessionFinishedDto;
 import com.ckcspoc.ckcspocapigw.common.dto.event.collaboration.CKCSEventUserDisconnectedDto;
 import com.ckcspoc.ckcspocapigw.common.dto.event.comments.CKCSEventCommentAddedDto;
 import com.ckcspoc.ckcspocapigw.common.dto.event.comments.CKCSEventCommentRemovedDto;
@@ -44,7 +44,7 @@ public class CKCSEventDtoFactory {
         eventClasses.put(CKCSEventUserConnectedDto.EVENT_KEY, CKCSEventUserConnectedDto.class);
         eventClasses.put(CKCSEventUserDisconnectedDto.EVENT_KEY, CKCSEventUserDisconnectedDto.class);
         eventClasses.put(CKCSEventCollaborationSessionUpdatedDto.EVENT_KEY, CKCSEventCollaborationSessionUpdatedDto.class);
-        eventClasses.put(CKCSEventCollaborationSessionRemovedDto.EVENT_KEY, CKCSEventCollaborationSessionRemovedDto.class);
+        eventClasses.put(CKCSEventCollaborationSessionFinishedDto.EVENT_KEY, CKCSEventCollaborationSessionFinishedDto.class);
         eventClasses.put(CKCSEventCollaborationSessionRecoveredDto.EVENT_KEY, CKCSEventCollaborationSessionRecoveredDto.class);
 
         // Document Storage Events

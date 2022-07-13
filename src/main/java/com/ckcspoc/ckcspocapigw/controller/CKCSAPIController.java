@@ -3,7 +3,7 @@ package com.ckcspoc.ckcspocapigw.controller;
 import com.ckcspoc.ckcspocapigw.common.dto.editor.EditorBundleDto;
 import com.ckcspoc.ckcspocapigw.common.service.CKCSAPIIntegrationService;
 import com.ckcspoc.ckcspocapigw.common.service.CKCSAuthenticationService;
-import com.ckcspoc.ckcspocapigw.dto.CollaborativeSessionDto;
+import com.ckcspoc.ckcspocapigw.common.dto.CKCSCollaborativeSessionDto;
 import com.ckcspoc.ckcspocapigw.service.CKCSService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,7 +89,7 @@ public class CKCSAPIController {
 
     @PostMapping("/collaborations")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Object> createCollaboration(@RequestBody CollaborativeSessionDto collaborativeSessionDto){
+    public ResponseEntity<Object> createCollaboration(@RequestBody CKCSCollaborativeSessionDto collaborativeSessionDto){
         log.info("CKCSAPIController::createCollaboration::"+collaborativeSessionDto);
         Object response = this.ckcsAPIIntegrationService.createCollaboration(collaborativeSessionDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -142,6 +142,22 @@ public class CKCSAPIController {
     public ResponseEntity<Object> getDocumentFromStorage(@PathVariable(value = "documentId") String documentId){
         log.info("CKCSAPIController::getDocumentFromStorage::"+documentId);
         String response = this.ckcsAPIIntegrationService.getDocumentFromStorage(documentId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/storage/{documentId}/exists")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Object> isDocumentAtStorage(@PathVariable(value = "documentId") String documentId){
+        log.info("CKCSAPIController::isDocumentAtStorage::"+documentId);
+        Object response = this.ckcsAPIIntegrationService.isDocumentAtStorage(documentId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/storage/{documentId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Object> deleteDocumentFromStorage(@PathVariable(value = "documentId") String documentId){
+        log.info("CKCSAPIController::deleteDocumentFromStorage::"+documentId);
+        Object response = this.ckcsAPIIntegrationService.deleteDocumentFromStorage(documentId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

@@ -17,28 +17,27 @@ import java.util.Optional;
 @Slf4j
 public class SoapService {
 
-
     private final SoapDao soapDao;
 
     private final SoapConverter soapConverter;
-
-    private final EntityManager entityManager;
 
     private final CKCSService ckcsService;
 
     public SoapService(SoapDao soapDao,
                        SoapConverter soapConverter,
-                       EntityManager entityManager,
                        CKCSService ckcsService) {
         this.soapDao = soapDao;
         this.soapConverter = soapConverter;
-        this.entityManager = entityManager;
         this.ckcsService = ckcsService;
     }
 
     // TODO: be adapted
     public String getChannelId(Integer baseId, Integer type) throws Exception{
         String documentId = DocumentUtil.getDocumentId(baseId, type);
+        if (this.ckcsService.hasToInitializeData(documentId)){
+            DocumentDto dto = this.getDocument(documentId);
+            this.ckcsService.sendDocumentToCloud(dto);
+        }
         return documentId;
     }
 
@@ -57,8 +56,6 @@ public class SoapService {
                 documentDto.setContent(soap.getDischargeNotes());
             }
         }
-
-        //this.ckcsService.syncDocumentToStorage(documentDto);
 
         return documentDto;
     }
@@ -104,10 +101,7 @@ public class SoapService {
                 .get();
     }
 
-    protected DbSoap saveAndRefresh(DbSoap detached) {
-        DbSoap updated = this.soapDao.save(detached);
-        this.entityManager.flush();
-        this.entityManager.refresh(updated);
-        return updated;
+    protected DbSoap saveAndRefresh(DbSoap dbSoap) {
+        return this.soapDao.save(dbSoap);
     }
 }

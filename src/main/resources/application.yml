@@ -52,3 +52,5 @@ ckcs:
 
 ckcs-organization-id: "89797"
 ckcs-client-api-url: "https://${ckcs-organization-id}.cke-cs.com/api/v5/${ckcs.auth.environmentId}"
+ckcs-uses-doc-storage: ${CKCS_USES_DOC_STORAGE:true}
+ckcs-sync-doc-storage: ${CKCS_SYNC_DOC_STORAGE:true}

@@ -4,7 +4,8 @@ import com.ckcspoc.ckcspocapigw.client.CKCSClient;
 import com.ckcspoc.ckcspocapigw.common.dto.CKCSRequestDto;
 import com.ckcspoc.ckcspocapigw.common.dto.editor.EditorBundleDto;
 import com.ckcspoc.ckcspocapigw.common.util.CKCSConstants;
-import com.ckcspoc.ckcspocapigw.dto.CollaborativeSessionDto;
+import com.ckcspoc.ckcspocapigw.common.dto.CKCSCollaborativeSessionDto;
+import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -72,7 +73,7 @@ public class CKCSAPIIntegrationService {
         return this.ckcsClient.flushCollaborations(request.getSignature(), request.getTimestamp(), force);
     }
 
-    public Object createCollaboration(CollaborativeSessionDto dto) {
+    public Object createCollaboration(CKCSCollaborativeSessionDto dto) {
         String path = "/collaborations";
         CKCSRequestDto request = this.ckcsAuthenticationService.getRequest(CKCSConstants.POST, path, dto);
         return this.ckcsClient.createCollaboration(request.getSignature(), request.getTimestamp(), request.getBody());
@@ -123,5 +124,23 @@ public class CKCSAPIIntegrationService {
         CKCSRequestDto request = this.ckcsAuthenticationService.getRequest(CKCSConstants.GET, path);
         return this.ckcsClient.getDocumentFromStorage(request.getSignature(), request.getTimestamp(), documentId);
     }
+
+    public Boolean isDocumentAtStorage(String documentId) {
+        try{
+            String content = this.getDocumentFromStorage(documentId);
+            return (content!=null);
+        }
+        catch(FeignException.NotFound fe){
+            return false;
+        }
+    }
+
+    public Object deleteDocumentFromStorage(String documentId) {
+        String path = "/storage/"+documentId;
+
+        CKCSRequestDto request = this.ckcsAuthenticationService.getRequest(CKCSConstants.DELETE, path);
+        return this.ckcsClient.deleteDocumentFromStorage(request.getSignature(), request.getTimestamp(), documentId);
+    }
+
 
 }

@@ -4,6 +4,7 @@ import com.ckcspoc.ckcspocapigw.common.service.CKCSAPIIntegrationService;
 import com.ckcspoc.ckcspocapigw.common.service.CKCSAuthenticationService;
 import com.ckcspoc.ckcspocapigw.common.util.CKCSConstants;
 import com.ckcspoc.ckcspocapigw.dto.DocumentDto;
+import com.ckcspoc.ckcspocapigw.service.CKCSEventService;
 import com.ckcspoc.ckcspocapigw.service.CKCSService;
 import com.ckcspoc.ckcspocapigw.service.SoapService;
 import lombok.extern.slf4j.Slf4j;
@@ -30,18 +31,33 @@ import javax.servlet.http.HttpServletRequest;
 @CrossOrigin
 public class CKCSController {
     private final CKCSService ckcsService;
+    private final CKCSEventService ckcsEventService;
+
     private final CKCSAuthenticationService ckcsAuthenticationService;
     private final SoapService soapService;
 
     @Autowired
     public CKCSController(
             CKCSService ckcsService,
+            CKCSEventService ckcsEventService,
             CKCSAuthenticationService ckcsAuthenticationService,
             CKCSAPIIntegrationService ckcsAPIIntegrationService,
             SoapService soapService) {
         this.ckcsService = ckcsService;
+        this.ckcsEventService = ckcsEventService;
         this.ckcsAuthenticationService = ckcsAuthenticationService;
         this.soapService = soapService;
+    }
+
+
+    // Delivers: Channel Id
+    // Triggered by: CKEditor UI component
+    // Generates channelId (documentId) based on baseId (example: soapid) and type (example: medical or discharged note)
+    @GetMapping("/channelId")
+    public String getChannelId(@RequestParam(value = "baseId") Integer baseId,
+                               @RequestParam(value = "type") Integer type) throws Exception{
+        log.info("CKCSController::getChannelId::"+baseId+"::"+type);
+        return this.soapService.getChannelId(baseId, type);
     }
 
     // Delivers: User token
@@ -49,28 +65,9 @@ public class CKCSController {
     // Generates user token based on personId
     @GetMapping("/token")
     public String getToken(@RequestParam(value = "personId") Integer personId) {
+        log.info("CKCSController::getToken::"+personId);
         return this.ckcsService.getToken(personId);
     }
-
-    // Delivers: Channel Id
-    // Triggered by: CKEditor UI component
-    // Generates channelId (documentId) based on baseId (example: soapid) and type (example: medical or discharged note)
-    @GetMapping("/channelId")
-    public String getChannelId(@RequestParam(value = "baseId") Integer baseId,
-                                @RequestParam(value = "type") Integer type) throws Exception{
-        log.info("CKCSController::getChannelId::"+baseId+"::"+type);
-        return this.soapService.getChannelId(baseId, type);
-    }
-
-    // Delivers: Document (initial data)
-    // Triggered by: CKEditor UI component
-    // Delivers DocumentDto based on a channelId
-    @GetMapping("/document")
-    public DocumentDto getDocument(@RequestParam(value = "channelId") String channelId) {
-        log.info("CKCSController::getDocument::"+channelId);
-        return this.soapService.getDocument(channelId);
-    }
-
 
     // Delivers: HTTP Status Response
     // Triggered by: CKEditor Cloud Services
@@ -85,7 +82,7 @@ public class CKCSController {
         String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         try{
             this.ckcsAuthenticationService.validateSignature(CKCSConstants.POST, path, ckcsSignature, ckcsTimestamp, payload);
-            this.ckcsService.handleEvent(payload);
+            this.ckcsEventService.handleEvent(payload);
             return new ResponseEntity<>(payload, HttpStatus.OK);
         }
         catch(Exception e){
