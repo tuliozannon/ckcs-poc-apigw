@@ -1,6 +1,9 @@
 package com.ckcspoc.ckcspocapigw.controller;
 
+import com.ckcspoc.ckcspocapigw.common.dto.CKCSCommentDto;
+import com.ckcspoc.ckcspocapigw.common.dto.CKCSSuggestionDto;
 import com.ckcspoc.ckcspocapigw.common.dto.editor.EditorBundleDto;
+import com.ckcspoc.ckcspocapigw.common.dto.event.comments.CKCSEventCommentAddedDto;
 import com.ckcspoc.ckcspocapigw.common.service.CKCSAPIIntegrationService;
 import com.ckcspoc.ckcspocapigw.common.service.CKCSAuthenticationService;
 import com.ckcspoc.ckcspocapigw.common.dto.CKCSCollaborativeSessionDto;
@@ -100,6 +103,62 @@ public class CKCSAPIController {
     public ResponseEntity<Object> restoreCollaboration(@PathVariable(value = "documentId") String documentId){
         log.info("CKCSAPIController::restoreCollaboration::"+documentId);
         Object response = this.ckcsAPIIntegrationService.restoreCollaboration(documentId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    /**************************************************************************
+     * COMMENTS
+     **************************************************************************/
+    @GetMapping("/comments")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Object> getComments(
+            @RequestParam(required = true, value = "document_id") String documentId,
+            @RequestParam(required = false, value = "include_deleted") Boolean includeDeleted,
+            @RequestParam(required = false, value = "limit") Integer limit,
+            @RequestParam(required = false, value = "sort_by") String sortBy,
+            @RequestParam(required = false, value = "order") String order){
+        log.info("CKCSAPIController::getComments");
+        Object response = this.ckcsAPIIntegrationService.getComments(documentId, includeDeleted, limit, sortBy, order);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/comments/{commentId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Object> getComment(
+            @PathVariable(value = "commentId") String commentId,
+            @RequestParam(required = false, value = "include_deleted") Boolean includeDeleted
+
+    ){
+        log.info("CKCSAPIController::getComment");
+        Object response = this.ckcsAPIIntegrationService.getComment(commentId, includeDeleted);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    /**************************************************************************
+     * SUGGESTIONS
+     **************************************************************************/
+    @GetMapping("/suggestions")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Object> getSuggestions(
+        @RequestParam(required = true, value = "document_id") String documentId,
+        @RequestParam(required = false, value = "include_deleted") Boolean includeDeleted,
+        @RequestParam(required = false, value = "limit") Integer limit,
+        @RequestParam(required = false, value = "sort_by") String sortBy,
+        @RequestParam(required = false, value = "order") String order){
+            log.info("CKCSAPIController::getSuggestions");
+            Object response = this.ckcsAPIIntegrationService.getSuggestions(documentId, includeDeleted, limit, sortBy, order);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+    @GetMapping("/suggestions/{suggestionId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Object> getSuggestion(
+            @PathVariable(value = "suggestionId") String suggestionId,
+            @RequestParam(required = true, value = "document_id") String documentId,
+            @RequestParam(required = false, value = "include_deleted") Boolean includeDeleted
+            ){
+        log.info("CKCSAPIController::getSuggestion::"+suggestionId);
+        Object response = this.ckcsAPIIntegrationService.getSuggestion(suggestionId, includeDeleted);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

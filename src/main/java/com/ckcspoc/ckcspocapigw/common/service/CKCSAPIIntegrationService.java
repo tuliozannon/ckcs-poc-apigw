@@ -1,13 +1,16 @@
 package com.ckcspoc.ckcspocapigw.common.service;
 
 import com.ckcspoc.ckcspocapigw.client.CKCSClient;
+import com.ckcspoc.ckcspocapigw.common.dto.CKCSCommentDto;
 import com.ckcspoc.ckcspocapigw.common.dto.CKCSRequestDto;
+import com.ckcspoc.ckcspocapigw.common.dto.CKCSSuggestionDto;
 import com.ckcspoc.ckcspocapigw.common.dto.editor.EditorBundleDto;
 import com.ckcspoc.ckcspocapigw.common.util.CKCSConstants;
 import com.ckcspoc.ckcspocapigw.common.dto.CKCSCollaborativeSessionDto;
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Map;
 
@@ -84,6 +87,65 @@ public class CKCSAPIIntegrationService {
         CKCSRequestDto request = this.ckcsAuthenticationService.getRequest(CKCSConstants.PUT, path);
         return this.ckcsClient.createCollaboration(request.getSignature(), request.getTimestamp(), documentId);
     }
+
+    /**************************************************************************
+     * COMMENTS
+     **************************************************************************/
+    public Object getComments(
+            String documentId,
+            Boolean includeDeleted,
+            Integer limit,
+            String sortBy,
+            String order
+    ) {
+        if (includeDeleted==null) includeDeleted = false;
+        if (limit==null) limit = 100;
+        if (sortBy==null) sortBy = "created_at";
+        if (order==null) order = "asc";
+        String path = "/comments?document_id="+documentId+"&included_deleted="+includeDeleted+"&limit="+limit+"&sort_by="+sortBy+"&order="+order;
+
+        CKCSRequestDto request = this.ckcsAuthenticationService.getRequest(CKCSConstants.GET, path);
+        return this.ckcsClient.getComments(request.getSignature(), request.getTimestamp(),
+                documentId, includeDeleted, limit, sortBy, order);
+    }
+
+    public String getComment(String commentId, Boolean includeDeleted) {
+        if (includeDeleted==null) includeDeleted = false;
+        String path = "/comments/"+commentId+"?include_deleted="+includeDeleted;
+
+        CKCSRequestDto request = this.ckcsAuthenticationService.getRequest(CKCSConstants.GET, path);
+        return this.ckcsClient.getComment(request.getSignature(), request.getTimestamp(), commentId, includeDeleted);
+    }
+
+    /**************************************************************************
+     * SUGGESTIONS
+     **************************************************************************/
+    public Object getSuggestions(
+            String documentId,
+            Boolean includeDeleted,
+            Integer limit,
+            String sortBy,
+            String order
+    ) {
+        if (includeDeleted==null) includeDeleted = false;
+        if (limit==null) limit = 100;
+        if (sortBy==null) sortBy = "created_at";
+        if (order==null) order = "asc";
+        String path = "/suggestions?document_id="+documentId+"&included_deleted="+includeDeleted+"&limit="+limit+"&sort_by="+sortBy+"&order="+order;
+
+        CKCSRequestDto request = this.ckcsAuthenticationService.getRequest(CKCSConstants.GET, path);
+        return this.ckcsClient.getSuggestions(request.getSignature(), request.getTimestamp(),
+                documentId, includeDeleted,
+                limit, sortBy, order);
+    }
+
+    public String getSuggestion(String suggestionId, Boolean includeDeleted) {
+        if (includeDeleted==null) includeDeleted = false;
+        String path = "/suggestions/"+suggestionId+"?include_deleted="+includeDeleted;
+        CKCSRequestDto request = this.ckcsAuthenticationService.getRequest(CKCSConstants.GET, path);
+        return this.ckcsClient.getSuggestion(request.getSignature(), request.getTimestamp(), suggestionId, includeDeleted);
+    }
+
 
     /**************************************************************************
      * EDITOR BUNDLE

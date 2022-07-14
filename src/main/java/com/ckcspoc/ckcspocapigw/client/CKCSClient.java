@@ -68,6 +68,53 @@ public interface CKCSClient {
             @RequestBody String collaborationData);
 
     /**************************************************************************
+     * COMMENTS
+     **************************************************************************/
+    //Get a list of comments
+    @GetMapping("/comments?document_id={document_id}&included_deleted={include_deleted}&limit={limit}&sort_by={sortBy}&order={order}&cursor={cursor}")
+    Object getComments(
+            @RequestHeader("X-CS-Signature") String xcsSignature,
+            @RequestHeader("X-CS-Timestamp") String xcsTimestamp,
+            @PathVariable String documentId,
+            @PathVariable Boolean includedDeleted,
+            @PathVariable Integer limit,
+            @PathVariable String sortBy,
+            @PathVariable String order
+    );
+
+
+    //Get a comment
+    @GetMapping("/comments/{commentId}?include_deleted={includeDeleted}&document_id={documentId}")
+    String getComment(
+            @RequestHeader("X-CS-Signature") String xcsSignature,
+            @RequestHeader("X-CS-Timestamp") String xcsTimestamp,
+            @PathVariable String commentId,
+            @PathVariable Boolean includeDeleted);
+
+    /**************************************************************************
+     * SUGGESTIONS
+     **************************************************************************/
+    //Get a list of suggestions
+    @GetMapping("/suggestions?included_deleted={include_deleted}&limit={limit}&sort_by={sortBy}&order={order}&cursor={cursor}&document_id={document_id}&thread_id={thread_id}")
+    Object getSuggestions(
+            @RequestHeader("X-CS-Signature") String xcsSignature,
+            @RequestHeader("X-CS-Timestamp") String xcsTimestamp,
+            @PathVariable String documentId,
+            @PathVariable Boolean includedDeleted,
+            @PathVariable Integer limit,
+            @PathVariable String sortBy,
+            @PathVariable String order
+    );
+
+    //Get a suggestion
+    @GetMapping("/suggestions/{suggestionId}?include_deleted={includeDeleted}")
+    String getSuggestion(
+            @RequestHeader("X-CS-Signature") String xcsSignature,
+            @RequestHeader("X-CS-Timestamp") String xcsTimestamp,
+            @PathVariable String suggestionId,
+            @PathVariable Boolean includeDeleted);
+
+    /**************************************************************************
      * EDITOR BUNDLE
      **************************************************************************/
     //Check if a specific editor bundle exists

@@ -78,7 +78,7 @@ public class CKCSController {
                                               @RequestHeader("X-CS-Timestamp") String ckcsTimestamp,
                                               @RequestBody String payload,
                                               HttpServletRequest request) {
-        log.info("CKCSController::execWebhook::[EVENT]");
+        log.info("CKCSController::execWebhook::[EVENT]::"+payload);
         String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         try{
             this.ckcsAuthenticationService.validateSignature(CKCSConstants.POST, path, ckcsSignature, ckcsTimestamp, payload);
